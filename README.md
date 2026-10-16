@@ -41,12 +41,11 @@ npm run smoke
 1. Open the dashboard and click **Run baseline**. The original test fails against the real broken calculator implementation.
 2. Select the new ledger entry and inspect the command, expected/actual result, exit code evidence, and assertion output.
 3. Click **Verify good repair**. PROOFLOOP copies the scenario to a temporary workspace, applies the good patch, and runs both the original and regression checks. The verdict is `PASS` only when both pass.
-4. Click **Challenge with bad fix**. The bad patch makes the headline test pass but regression checks fail; the overall verdict remains `FAIL`.
-5. Click **Challenge bad fix** to see the original test pass while regression evidence fails.
-6. Use the evidence filters, open a run, inspect its timeline and diff, and download JSON or HTML evidence.
-7. The comparison section shows `NOT RUN` until each scenario has a real stored record.
-8. Use **Reset demo** to clear the local ledger and repeat the flow.
-9. The execution-error fixture is available through `POST /api/verify/error` and is displayed as `ERROR`; timeout behavior is covered by the automated boundary test.
+4. Click **Challenge bad fix**. The bad patch makes the headline test pass but regression checks fail; the overall verdict remains `FAIL`.
+5. Use the evidence filters, open a run, inspect its timeline and diff, and download JSON or HTML evidence.
+6. The comparison section shows `NOT RUN` until each scenario has a real stored record.
+7. Use **Reset demo** to clear the local ledger and repeat the flow.
+8. The execution-error fixture is available through `POST /api/verify/error` and is displayed as `ERROR`; timeout behavior is covered by the automated boundary test.
 
 ## Architecture
 
