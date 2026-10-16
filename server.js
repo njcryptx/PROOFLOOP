@@ -14,7 +14,7 @@ const server=http.createServer(async (req,res)=>{
     if(req.method==='POST' && url.pathname==='/api/verify/baseline') return send(res,201,await createRun({mode:'baseline'}));
     if(req.method==='POST' && url.pathname==='/api/verify/repair') { const b=await body(req); return send(res,201,await createRun({mode:'repair',repair:b.repair})); }
     if(req.method==='POST' && url.pathname==='/api/reset') return send(res,200,await reset());
-    if(req.method==='GET') { const requested=url.pathname==='/'?'index.html':url.pathname.slice(1); const safe=path.normalize(requested); if(safe.startsWith('..')) return send(res,404,{error:'not found'}); const file=path.join(ROOT,safe); const content=await fs.readFile(file); return send(res,200,content,MIME[path.extname(file)]||'application/octet-stream'); }
+    if(req.method==='GET') { const requested=url.pathname==='/'?'index.html':url.pathname.slice(1); const safe=path.normalize(requested); if(safe.startsWith('..')) return send(res,404,{error:'not found'}); const file=path.join(ROOT,safe); try { const content=await fs.readFile(file); return send(res,200,content,MIME[path.extname(file)]||'application/octet-stream'); } catch(error) { if(error.code==='ENOENT') return send(res,404,{error:'not found'}); throw error; } }
     send(res,404,{error:'not found'});
   } catch(error) { console.error(error); send(res,500,{error:error.message}); }
 });
