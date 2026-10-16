@@ -29,7 +29,7 @@ npm test
 npm start
 ```
 
-Open <http://localhost:4173>. The exact one-command test entry point is `npm test`. For a terminal demonstration of all three outcomes:
+Open <http://localhost:4173>. The exact one-command test entry point is `npm test`. For a terminal demonstration of all four outcomes:
 
 ```bash
 npm run smoke
@@ -46,17 +46,17 @@ npm run smoke
 6. Use the evidence filters, open a run, inspect its timeline and diff, and download JSON or HTML evidence.
 7. The comparison section shows `NOT RUN` until each scenario has a real stored record.
 8. Use **Reset demo** to clear the local ledger and repeat the flow.
-9. The execution-error fixture is available through `POST /api/verify/error` and is displayed as `ERROR`.
+9. The execution-error fixture is available through `POST /api/verify/error` and is displayed as `ERROR`; timeout behavior is covered by the automated boundary test.
 
 ## Architecture
 
 - `index.html`, `styles.css`, `app.js`: dashboard UI and evidence inspection.
 - `server.js`: dependency-free HTTP server and JSON API.
 - `lib/engine.js`: scenario copying, allowlisted test execution, repair application, verdict calculation, SHA-256 evidence digests, timeline generation, and persistence.
-- `scenarios/calculator`: source defect, deterministic tests, good/bad repair fixtures, and an execution-error fixture.
+- `scenarios/calculator`: source defect, deterministic tests, good/bad repair fixtures, plus execution-error and timeout fixtures.
 - `test/engine.test.js`: behavior tests for reproduction, successful repair, bad-fix rejection, error verdicts, digest integrity, allowlist rejection, persistence, and reset.
 
-The engine only executes three fixed test files with Node, uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories. API bodies are bounded and repair values are allowlisted; arbitrary browser-supplied commands and paths are rejected.
+The engine only executes four fixed test files with Node (including explicit error and timeout fixtures), uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories. API bodies are bounded and repair values are allowlisted; arbitrary browser-supplied commands and paths are rejected.
 
 ## Verdicts
 
