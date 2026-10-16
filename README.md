@@ -1,0 +1,71 @@
+# PROOFLOOP
+
+**Every fix must prove itself.**
+
+PROOFLOOP is an evidence-first autonomous software verification MVP for the Agents & Automation track. It demonstrates how a verification agent can independently reproduce a defect, apply a proposed repair in an isolated workspace, execute the original and regression tests, and issue a verdict from observed results rather than from a repair claim.
+
+## What is implemented
+
+- A responsive local dashboard with verification history and inspectable evidence.
+- A deliberately broken calculator scenario: `20% off 250` incorrectly returns `230` instead of `200`.
+- A baseline run that executes the real allowlisted command `node test-original.js` and records output, exit code, duration, and status.
+- A deterministic good repair applied only to a temporary copy, followed by the original test and regression tests.
+- A mandatory bad-fix challenge: the attempted fix satisfies the headline case but fails regression checks, so PROOFLOOP rejects it.
+- Local JSON evidence persistence in `data/runs.json` (ignored from Git because it is runtime state).
+- Explicit `PASS`, `FAIL`, and `ERROR` verdict logic. Timeouts and execution errors cannot become `PASS`.
+- A reset action that clears the evidence ledger and makes the demonstration repeatable.
+
+The MVP does not call a generative model or claim automatic bug-fix generation. The included repairs are deterministic fixtures so judges can inspect and repeat the verification mechanism without credentials or network access.
+
+## Run locally
+
+Requirements: Node.js 22 (or Node 20+). No npm dependency installation is required.
+
+```bash
+npm test
+npm start
+```
+
+Open <http://localhost:4173>. The exact one-command test entry point is `npm test`. For a terminal demonstration of all three outcomes:
+
+```bash
+npm run smoke
+# {"baseline":"FAIL","good":"PASS","bad":"FAIL"}
+```
+
+## Judge walkthrough
+
+1. Open the dashboard and click **Run baseline**. The original test fails against the real broken calculator implementation.
+2. Select the new ledger entry and inspect the command, expected/actual result, exit code evidence, and assertion output.
+3. Click **Verify good repair**. PROOFLOOP copies the scenario to a temporary workspace, applies the good patch, and runs both the original and regression checks. The verdict is `PASS` only when both pass.
+4. Click **Challenge with bad fix**. The bad patch makes the headline test pass but regression checks fail; the overall verdict remains `FAIL`.
+5. Use **Reset demo** to clear the local ledger and repeat the flow.
+
+## Architecture
+
+- `index.html`, `styles.css`, `app.js`: dashboard UI and evidence inspection.
+- `server.js`: dependency-free HTTP server and JSON API.
+- `lib/engine.js`: scenario copying, allowlisted test execution, repair application, verdict calculation, and persistence.
+- `scenarios/calculator`: source defect, deterministic tests, and good/bad repair fixtures.
+- `test/engine.test.js`: behavior tests for reproduction, successful repair, bad-fix rejection, error verdicts, persistence, and reset.
+
+The engine only executes two fixed test files with Node, uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories.
+
+## Verdicts
+
+- **PASS** — every required verification test completed with exit code 0.
+- **FAIL** — required tests completed but at least one failed.
+- **ERROR** — verification could not complete reliably, such as a timeout or runner error.
+
+PROOFLOOP establishes evidence against this defined test set and execution boundary; it does not guarantee bug-free software.
+
+## Docker
+
+```bash
+docker build -t proofloop .
+docker run --rm -p 4173:4173 proofloop
+```
+
+## Known limitations
+
+This buildathon MVP verifies the included calculator scenario and deterministic repair fixtures. It does not yet ingest arbitrary repositories, generate patches with an AI model, or provide a production-grade container sandbox/resource quota system. No deployment or public repository is claimed by this local build.

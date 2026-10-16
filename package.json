@@ -1,0 +1,8 @@
+{
+  "name": "proofloop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Evidence-first autonomous software verification",
+  "scripts": {"start": "node server.js", "test": "node --test test/*.test.js", "smoke": "node scripts/smoke.js"},
+  "engines": {"node": ">=20"}
+}
