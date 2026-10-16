@@ -1,7 +1,7 @@
 # PROOFLOOP progress
 
 - **Updated:** 2026-10-17 (Asia/Kolkata)
-- **Current phase:** Phase 2 repository created; authenticated push blocked in the container
+- **Current phase:** Phase 2 repository created and local history prepared; authenticated push blocked in the container
 - **Local commit:** `f8cc694` (`docs: record quality and release audit`)
 - **Working tree at update:** clean before this progress file
 
@@ -22,4 +22,4 @@
 
 ## Next action
 
-Run `git push -u origin master` from the authenticated VS Code terminal. Then resume this session so the public branch, latest commit, README, and tracked-file list can be verified.
+The GitHub repository contains the generated MIT LICENSE on `main`. The local `master` now includes that initialization through merge commit `92b75a7`. Run `git push -u origin master:main` from the authenticated VS Code terminal (non-force) to fast-forward the public `main` branch, then resume this session so the latest commit, README, and tracked-file list can be verified.
