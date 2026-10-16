@@ -76,4 +76,4 @@ The server honors the `PORT` and `HOST` environment variables. Local runs bind t
 
 ## Known limitations
 
-This buildathon MVP verifies the included calculator scenario and deterministic repair fixtures. It does not yet ingest arbitrary repositories, generate patches with an AI model, or provide a production-grade container sandbox/resource quota system. No deployment or public repository is claimed by this local build.
+This buildathon MVP verifies the included calculator scenario and deterministic repair fixtures. It does not yet ingest arbitrary repositories, generate patches with an AI model, or provide a production-grade container sandbox/resource quota system. A public repository shell exists at `https://github.com/njcryptx/PROOFLOOP`, but the local project commits are not yet pushed from this environment. No live deployment is claimed.

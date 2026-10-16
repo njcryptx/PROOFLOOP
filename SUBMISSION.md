@@ -43,7 +43,7 @@ Expected smoke summary:
 
 ## Publication status
 
-- GitHub repository URL: **not yet published**
+- GitHub repository URL: **https://github.com/njcryptx/PROOFLOOP** (public repository created; project commits still require authenticated push)
 - Live deployment URL: **not yet deployed**
 - Demo video URL: **not yet recorded**
 - Qualifying OmniRush session/event submission details: **to be confirmed in the buildathon portal**
