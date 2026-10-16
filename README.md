@@ -22,7 +22,7 @@ The MVP does not call a generative model or claim automatic bug-fix generation. 
 
 ## Run locally
 
-Requirements: Node.js 22 (or Node 20+). No npm dependency installation is required.
+Requirements: Node.js 22 (or Node 20+). The dependency tree is empty; `package-lock.json` is committed for reproducible npm tooling.
 
 ```bash
 npm test
@@ -55,7 +55,7 @@ npm run smoke
 - `scenarios/calculator`: source defect, deterministic tests, good/bad repair fixtures, plus execution-error and timeout fixtures.
 - `test/engine.test.js`: behavior tests for reproduction, successful repair, bad-fix rejection, error verdicts, digest integrity, allowlist rejection, persistence, and reset.
 
-The engine only executes four fixed test files with Node (including explicit error and timeout fixtures), uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories. API bodies are bounded and repair values are allowlisted; arbitrary browser-supplied commands and paths are rejected.
+The engine only executes five fixed test files with Node (including error, timeout, and output-limit fixtures), uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories. API bodies are bounded and repair values are allowlisted; arbitrary browser-supplied commands and paths are rejected.
 
 ## Verdicts
 
@@ -72,7 +72,7 @@ docker build -t proofloop .
 docker run --rm -p 4173:4173 proofloop
 ```
 
-The server honors the `PORT` environment variable. For a live deployment, use a container host that supports a persistent writable volume mounted at `/app/data`; the evidence ledger is local JSON state and will otherwise be lost when an ephemeral instance is replaced. A small persistent-disk service on Render, Fly.io, Railway, or an equivalent container host is a suitable deployment shape. This repository does not include provider-specific credentials, deployment configuration, or a claimed live URL.
+The server honors the `PORT` and `HOST` environment variables. Local runs bind to `127.0.0.1` by default; the Docker image sets `HOST=0.0.0.0` so the container port is reachable. The optional `PROOFLOOP_DATA_FILE` variable selects a ledger path for isolated test/deployment storage. For a live deployment, use a container host that supports a persistent writable volume mounted at `/app/data`; the evidence ledger is local JSON state and will otherwise be lost when an ephemeral instance is replaced. A small persistent-disk service on Render, Fly.io, Railway, or an equivalent container host is a suitable deployment shape. This repository does not include provider-specific credentials, deployment configuration, or a claimed live URL.
 
 ## Known limitations
 

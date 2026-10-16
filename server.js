@@ -3,11 +3,13 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createRun, readRuns, reset } = require('./lib/engine');
 const PORT = Number(process.env.PORT || 4173);
+const HOST = process.env.HOST || '127.0.0.1';
+if (!Number.isInteger(PORT) || PORT < 0 || PORT > 65535) throw new Error('PORT must be an integer from 0 to 65535');
 const ROOT = __dirname;
 const MIME = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json; charset=utf-8', '.ico':'image/x-icon' };
 const MAX_BODY = 4096;
 const PUBLIC_FILES = new Set(['index.html', 'styles.css', 'app.js']);
-function send(res, code, body, type='application/json; charset=utf-8', extra={}) { res.writeHead(code, {'content-type':type, 'cache-control':'no-store', ...extra}); res.end(type.startsWith('application/json') ? JSON.stringify(body) : body); }
+function send(res, code, body, type='application/json; charset=utf-8', extra={}) { res.writeHead(code, {'content-type':type, 'cache-control':'no-store', 'x-content-type-options':'nosniff', 'x-frame-options':'DENY', 'referrer-policy':'no-referrer', 'content-security-policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'", ...extra}); res.end(type.startsWith('application/json') ? JSON.stringify(body) : body); }
 async function body(req) { let s=''; for await (const chunk of req) { s += chunk; if (s.length > MAX_BODY) throw Object.assign(new Error('Request body too large'), { statusCode: 413 }); } if (!s) return {}; try { return JSON.parse(s); } catch { throw Object.assign(new Error('invalid JSON'), { statusCode: 400 }); } }
 function escapeHtml(value='') { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function reportHtml(run) { return `<!doctype html><meta charset="utf-8"><title>PROOFLOOP ${escapeHtml(run.runId)}</title><style>body{font:14px system-ui;max-width:900px;margin:40px auto;color:#18221e}pre{background:#f2f6f0;padding:14px;white-space:pre-wrap}.badge{padding:4px 8px;border-radius:4px;background:#e8f6cf}.fail{background:#fde8e4}</style><h1>PROOFLOOP verification report</h1><p><b>Verdict:</b> <span class="badge ${run.verdict==='FAIL'?'fail':''}">${escapeHtml(run.verdict)}</span></p><p><b>Run:</b> ${escapeHtml(run.runId)}<br><b>Timestamp:</b> ${escapeHtml(run.timestamp)}<br><b>Digest:</b> ${escapeHtml(run.evidenceDigest)}</p><h2>Timeline</h2><ul>${(run.timeline||[]).map(x=>`<li>${escapeHtml(x.label)} — ${escapeHtml(x.status)}</li>`).join('')}</ul><h2>Evidence</h2><pre>${escapeHtml(JSON.stringify(run,null,2))}</pre>`; }
@@ -31,4 +33,5 @@ const server=http.createServer(async (req,res)=>{
     send(res,404,{error:'not found'});
   } catch(error) { if(!error.statusCode || error.statusCode >= 500) console.error(error); send(res,error.statusCode||500,{error:error.message}); }
 });
-server.listen(PORT,()=>console.log(`PROOFLOOP listening on http://localhost:${PORT}`));
+server.on('error', (error) => { console.error(error); process.exitCode = 1; });
+server.listen(PORT, HOST, ()=>console.log(`PROOFLOOP listening on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${server.address().port}`));

@@ -17,3 +17,5 @@ test('unknown tests are rejected by the allowlist', async () => { await assert.r
 test('timeout is classified as ERROR by the execution boundary', async () => { const result = await runAllowedTest(SCENARIO, 'timeout'); assert.equal(result.status, 'ERROR'); assert.equal(result.timedOut, true); });
 test('tampered persisted evidence is detected on read', async () => { await createRun({mode:'baseline'}); const file=path.join(__dirname, '..', 'data', 'runs.json'); const records=JSON.parse(await fs.readFile(file, 'utf8')); records[0].verdict='PASS'; await fs.writeFile(file, JSON.stringify(records)); await assert.rejects(() => readRuns(), /integrity check failed/); await reset(); });
 test('repairs do not modify the original scenario file', async () => { const file=path.join(SCENARIO, 'app.js'); const before=await fs.readFile(file, 'utf8'); await createRun({mode:'repair',repair:'good'}); assert.equal(await fs.readFile(file, 'utf8'), before); });
+
+test('output-limit failures are classified as ERROR', async () => { const result = await runAllowedTest(SCENARIO, 'output'); assert.equal(result.status, 'ERROR'); });
