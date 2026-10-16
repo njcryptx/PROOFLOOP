@@ -72,6 +72,8 @@ docker build -t proofloop .
 docker run --rm -p 4173:4173 proofloop
 ```
 
+The server honors the `PORT` environment variable. For a live deployment, use a container host that supports a persistent writable volume mounted at `/app/data`; the evidence ledger is local JSON state and will otherwise be lost when an ephemeral instance is replaced. A small persistent-disk service on Render, Fly.io, Railway, or an equivalent container host is a suitable deployment shape. This repository does not include provider-specific credentials, deployment configuration, or a claimed live URL.
+
 ## Known limitations
 
 This buildathon MVP verifies the included calculator scenario and deterministic repair fixtures. It does not yet ingest arbitrary repositories, generate patches with an AI model, or provide a production-grade container sandbox/resource quota system. No deployment or public repository is claimed by this local build.
