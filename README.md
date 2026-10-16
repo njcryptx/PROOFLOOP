@@ -12,6 +12,9 @@ PROOFLOOP is an evidence-first autonomous software verification MVP for the Agen
 - A deterministic good repair applied only to a temporary copy, followed by the original test and regression tests.
 - A mandatory bad-fix challenge: the attempted fix satisfies the headline case but fails regression checks, so PROOFLOOP rejects it.
 - Local JSON evidence persistence in `data/runs.json` (ignored from Git because it is runtime state).
+- A SHA-256 digest for every stored record, plus downloadable JSON and HTML reports. The digest detects later record changes; it does not prove the software is bug-free.
+- Search and verdict filters, a side-by-side comparison view, a verification timeline, patch inspection, and explicit `NOT RUN` comparison cards.
+- A deliberate execution-error fixture that produces `ERROR`, never `PASS`.
 - Explicit `PASS`, `FAIL`, and `ERROR` verdict logic. Timeouts and execution errors cannot become `PASS`.
 - A reset action that clears the evidence ledger and makes the demonstration repeatable.
 
@@ -30,7 +33,7 @@ Open <http://localhost:4173>. The exact one-command test entry point is `npm tes
 
 ```bash
 npm run smoke
-# {"baseline":"FAIL","good":"PASS","bad":"FAIL"}
+# {"baseline":"FAIL","good":"PASS","bad":"FAIL","error":"ERROR","digested":true}
 ```
 
 ## Judge walkthrough
@@ -39,17 +42,21 @@ npm run smoke
 2. Select the new ledger entry and inspect the command, expected/actual result, exit code evidence, and assertion output.
 3. Click **Verify good repair**. PROOFLOOP copies the scenario to a temporary workspace, applies the good patch, and runs both the original and regression checks. The verdict is `PASS` only when both pass.
 4. Click **Challenge with bad fix**. The bad patch makes the headline test pass but regression checks fail; the overall verdict remains `FAIL`.
-5. Use **Reset demo** to clear the local ledger and repeat the flow.
+5. Click **Challenge bad fix** to see the original test pass while regression evidence fails.
+6. Use the evidence filters, open a run, inspect its timeline and diff, and download JSON or HTML evidence.
+7. The comparison section shows `NOT RUN` until each scenario has a real stored record.
+8. Use **Reset demo** to clear the local ledger and repeat the flow.
+9. The execution-error fixture is available through `POST /api/verify/error` and is displayed as `ERROR`.
 
 ## Architecture
 
 - `index.html`, `styles.css`, `app.js`: dashboard UI and evidence inspection.
 - `server.js`: dependency-free HTTP server and JSON API.
-- `lib/engine.js`: scenario copying, allowlisted test execution, repair application, verdict calculation, and persistence.
-- `scenarios/calculator`: source defect, deterministic tests, and good/bad repair fixtures.
-- `test/engine.test.js`: behavior tests for reproduction, successful repair, bad-fix rejection, error verdicts, persistence, and reset.
+- `lib/engine.js`: scenario copying, allowlisted test execution, repair application, verdict calculation, SHA-256 evidence digests, timeline generation, and persistence.
+- `scenarios/calculator`: source defect, deterministic tests, good/bad repair fixtures, and an execution-error fixture.
+- `test/engine.test.js`: behavior tests for reproduction, successful repair, bad-fix rejection, error verdicts, digest integrity, allowlist rejection, persistence, and reset.
 
-The engine only executes two fixed test files with Node, uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories.
+The engine only executes three fixed test files with Node, uses a five-second timeout, and runs repairs in a temporary copied workspace. It records the patch identifier and changed file rather than accepting arbitrary dashboard code. This is a local demonstration boundary, not a general sandbox for untrusted repositories. API bodies are bounded and repair values are allowlisted; arbitrary browser-supplied commands and paths are rejected.
 
 ## Verdicts
 
